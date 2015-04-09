@@ -10,7 +10,12 @@
 
 ####PCRE函数
 1. [preg_quote](#preg_quote) - 转义正则表达式字符
-
+2. [preg_filter](#preg_filter) - 执行一个正则表达式搜索和替换
+3. [preg_grep](#preg_grep) - 返回匹配模式的数组条目
+4. [preg_match](#preg_match) - 执行一个正则表达式匹配
+5. [preg_match_all](#preg_match_all) - 执行一个全局正则表达式匹配
+6. [preg_replace](#preg_replace) - 执行一个正则表达式的搜索和替换
+7. [preg_split](#preg_split) - 通过一个正则表达式分隔字符串
 
 一些准备
 ---
@@ -511,25 +516,25 @@ PCRE 函数
 ---
 1. <p id="preg_quote">preg_quote - 转义正则表达式字符</p>
 
-    **说明：**
+    **说明**
 
-    _string_ **preg_quote**(_string_ $str [, _string_ $delimiter = NULL])
+    _string_ `preg_quote`(_string_ $str [, _string_ $delimiter = NULL])
 
-    preg_quote()需要参数str并向其中每个正则表达式语法中的字符前增加一个反斜线。这通常用于一些运行时的字符串，需要将其作为正则表达式来使用的时候。
+    `preg_quote()`需要参数str并向其中每个正则表达式语法中的字符前增加一个反斜线。这通常用于一些运行时的字符串，需要将其作为正则表达式来使用的时候。
 
     正则表达式特殊字符有：`. \ + * ? [ ^ ] $ ( ) { } = ! < > | : -`
 
-    **参数：**
+    **参数**
     
     _str_： 输入字符串
 
     _delimiter_： 如果指定了可选参数delimiter，它也会被转义。这通常用于转义PCRE函数使用的分隔符。'/'是最通用的分隔符。
 
-    **返回值：**
+    **返回值**
 
     返回转义后的字符串
 
-    **示例：**
+    **示例**
 
     ```php
     <?php
@@ -549,6 +554,313 @@ PCRE 函数
         $subject = '\d is a number';
         $pattern = '/' . preg_quote('\d') . '/';
         p(preg_replace($pattern, '5', $subject)); // 5 is a number
+    ?>
+    ```
+
+2. <p id="preg_filter">preg_filter - 执行一个正则表达式搜索和替换</p>
+
+    **说明**
+
+    _mixed_ `preg_filter`(_mixed_ $pattern, _mixed_ $replacement, _mixed_ $subject [, int $limit = -1 [, int &$count]])
+
+    `preg_filter()`等价于`preg_replace()`除了它仅仅返回(可能经过转化)与目标匹配的结果。
+
+    **返回值**
+
+    如果subject是一个数组，返回一个数组，其他情况返回一个字符串。
+
+    如果没有找到匹配或者发生了错误，当subject是数组时返回一个空数组，其他情况返回NULL。
+
+    **示例**
+
+    ```php
+    <?php
+        // 比较preg_filter()与preg_replace()
+        $subject = ['1', 'a', '2', 'b', '3', 'A', 'B', '4'];
+        $pattern = ['/\d/', '/[a-z]/', '/[1a]/'];
+        $replace = ['A:$0', 'B:$0', 'C:$0'];
+        p(preg_filter($pattern, $replace, $subject));
+        // [0 => 'A:C:1', 1 => 'B:C:a', 2 => 'A:2', 3 => 'B:b', 4 => 'A:3', 7 => 'A:4']
+
+        p(preg_replace($pattern, $replace, $subject));
+        // [0 => 'A:C:1', 1 => 'B:C:a', 2 => 'A:2', 3 => 'B:b', 4 => 'A:3', 5 => 'A', 6 => 'B', 7 => 'A:4']
+    ?>
+    ```
+
+3. <p id="preg_grep">preg_grep - 返回匹配模式的数组条目</p>
+
+    **说明**
+
+    _array_ `preg_grep`(_string_ $pattern, _array_ $input [, int $flags = 0])
+
+    返回给定数组input中与模式pattern匹配的元素组成的数组。
+
+    **参数**
+
+    _pattern_： 要搜索的模式，字符串形式。
+
+    _input_： 输入数组。
+
+    _flags_： 如果设置为`PREG_GREP_INVERT`，这个函数返回输入数组中与给定模式pattern不匹配的元素组成的数组。
+
+    **返回值**
+
+    返回使用input中key做索引的数组。
+
+    **示例**
+
+    ```php
+    <?php
+        $array = ['0.12', '.3', '88', '4a', 7.8];
+        $fl_array = preg_grep('/^(\d+)?\.\d+$/', $array);
+        p($fl_array); // [0 => '0.12', 1 => '.3', 4 => 7.8]
+
+        $other_array = preg_grep('/^(\d+)?\.\d+$/', $array, PREG_GREP_INVERT);
+        p($other_array); // [2 => '88', 3 => '4a']
+    ?>
+    ```
+
+4. <p id="preg_match">preg_match - 执行一个正则表达式匹配</p>
+
+    **说明**
+
+    _int_ `preg_match`(_string_ $pattern, _string_ $subject [, _array_ &$matches [, _int_ $flag = 0 [, _int_ $offset = 0]]])
+
+    搜索subject与pattern给定的正则表达式的一个匹配。
+
+    **参数**
+
+    _pattern_： 要搜索的模式，字符串类型。
+
+    _subject_： 输入字符串。
+
+    _matches_： 如果提供了参数matches，它将被填充为搜索结果。`$matches[0]`将包含完整模式匹配到的文本，`$matches[1]`将包含第一个捕获子组匹配到的文本，以此类推。
+
+    _flags_： flags如果被设置为`PREF_OFFSET_CAPTURE`，对于每一个出现的匹配返回时都会附加字符串偏移量(相对于目标字符串)。注意：这会改变填充到matches参数的数组，使其每个元素成为一个由第0个元素是匹配到的字符串，第1个元素是该匹配字符串在目标字符串subject中的偏移量。
+
+    _offset_： 通常从目标字符串的开始位置开始。可选参数offset用于指定从目标字符串的某个未知开始搜索(单位是字节)。
+
+    **返回值**
+
+    `preg_match()`返回pattern的匹配次数。它的值将是0次(不匹配)或1次，因为`preg_match()`在第一次匹配后将会停止搜索。
+
+    **示例**
+    
+    ```php
+    <?php
+        if (preg_match('/php/i', 'PHP is the web scripting language of choice.')) {
+            echo 'A match was found';
+        } else {
+            echo 'A match was not found';
+        }
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 从URL中获取主机名称
+        preg_match('@^(?:http://)?([^/]+)@i', 'http://www.php.net/index.html', $matches);
+        $host = $matches[1]; // www.php.net
+
+        // 获取主机名称的后面两部分
+        preg_match('/[^.]+\.[^.]+$/', $host, $matches); // [^.] 相当于 [^/.]
+        p($mathces[0]); // php.net
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 使用命名子组
+        $str = 'foobar: 2008';
+        preg_match('/(?<name>\w+): (?<digit>\d+)/', $str, $matches);
+        p($matches); // [0 => 'foobar: 2008', 'name' => 'foobar', 1 => 'foobar', digit => '2008', 2 => '2008']
+    ?>
+    ```
+
+5. <p id="preg_match_all">preg_match_all - 执行一个全局正则表达式匹配</p>
+
+    **说明**
+
+    _int_ `preg_match_all`(_string_ $pattern, _string_ $subject [, _array_ &$matches [, _int_ $flags = `PREG_PATTERN_ORDER` [, _int_ $offset = 0]]])
+
+    搜索subject中所有匹配pattern给定正则表达式的匹配结果并且将它们以flag指定顺序输出到matches中。
+
+    在第一个匹配找到后，子序列继续从最后一次匹配位置搜索。
+
+    **参数**
+
+    _pattern_： 要搜索的模式，字符串形式。
+
+    _subject_： 输入字符串。
+
+    _matches_： 多维数组，作为输出参数输出所有匹配结果，数组排序通过flags指定。
+
+    _flags_： 可以结合下面标记使用(注意不能同时使用`PREG_PATTERN_ORDER`和`PREG_SET_ORDER`)：
+    * `PREG_PATTERN_ORDER`：结果排序为`$matches[0]` 保存完整模式的所有匹配，`$matches[1]` 保存第一个子组的所有匹配，依次类推。
+
+        ```php
+        <?php
+            preg_match_all('|<[^>]+>(.*)</[^>]+>|U', '<b>example:</b><div align=left>this is a test</div>', $out, PREG_PATTERN_ORDER);
+            p($out); // [['<b>example:</b>', '<div align=left>this is a test</div>'], ['example:', 'this is a test']]
+            // ========================================================
+            // $out[0] 是包含匹配完整模式的字符串的数组，$out[1] 是包含闭合标签内的字符串的数组。
+        ?>
+        ```
+    * `PREG_SET_ORDER`：结果排序为`$matches[0]`包含第一次匹配得到的所有匹配(包含子组)，`$matches[1]`是包含第二次匹配到的所有匹配(包含子组)的数组，以此类推。
+
+        ```php
+        <?php
+            preg_match_all('|<[^>]+>(.*)</[^>]+>|U', '<b>example: </b><div align=\"left\">this is a test</div>', $out, PREG_SET_ORDER);
+            p($out); // [['<b>example:</b>', 'example'], ['<div align=\"left\">this is a test</div>', 'this is a test']]
+        ?>
+        ```
+    * `PREG_OFFSET_CAPTURE`：如果这个标记被传递，每个发现的匹配返回时会增加它相对目标字符串的偏移量。注意这会改变matches中的每一个匹配结果字符串元素，使其成为一个第0个元素为匹配结果字符串，第1个元素为匹配结果字符串在subject中的偏移量。
+
+    _offset_  通常，查找时从目标字符串的开始位置开始。可选参数offset用于从目标字符串中制定位置开始搜索(单位是字节)。
+
+    **返回值**
+
+    返回完整匹配次数(可能是0)，或者如果发生错误返回FALSE。
+
+    **示例**
+
+    ```php
+    <?php
+        // 查找所有文本中的电话号码
+        preg_match_all('/\(? (\d{3})? \)? (?(1) [\-\s]) \d{3}-\d{4}/x', 'Call 555-1212 or 1-800-555-1212', $phones);
+        p($phones); // [['555-1212', '800-555-1212'], ['', '800']]
+    ?>
+    ```
+
+6. <p id="preg_replace">preg_replace</p>
+
+    **说明**
+
+    _mixed_ `preg_replace`(_mixed_ $pattern, _mixed_ $replacement, _mixed_ $subject [, _int_ $limit = -1 [, _int_ &$count]])
+
+    搜索subject中匹配pattern的部分，以replacement进行替换。
+
+    **参数**
+    
+    _pattern_： 要搜索的模式。可以是一个字符串或字符串数组。
+
+    _replacement_： 用于替换的字符串或字符串数组。如果这个参数是一个字符串，并且pattern是一个数组，那么所有的模式都使用这个字符串进行替换。如果pattern和replacement都是数组，每个pattern使用replacement中对应的元素进行替换。如果replacement中的元素比pattern中的少，多出来的pattern使用空字符串进行替换。
+
+    _subject_： 要进行搜索和替换的字符串或字符串数组。如果subject是一个数组，搜索和替换会在subject的每一个元素上进行，并且返回值也会是一个数组。
+
+    _limit_： 每个模式在每个subject上进行替换的最大次数，默认是-1(无限)。
+
+    _count_： 如果指定，将会被填充为完成的替换次数。
+
+    **返回值**
+
+    如果subject是一个数组，`preg_replace()`返回一个数组，其它情况下返回一个字符串。
+
+    如果匹配被查找到，替换后的subject被返回，其它情况下返回没有改变的subject。如果发生错误，返回NULL。
+
+    **示例**
+
+    ```php
+    <?php
+        // 使用后向引用紧跟数值原文
+        $string = 'April 15, 2013';
+        $pattern = '/(\w+) (\d+), (\d+)/i';
+        $replacement = '${1}1,$3'; // 使用{}分开两个1
+        echo preg_replace($pattern, $replacement, $string); // April1,2013
+    ?>
+    ```
+
+    ```php
+    <?php
+        // preg_replace()中使用基于索引的数组
+        $string = 'The quick brown fox jumped over the lazy dog.';
+        $patterns = ['/quick/', '/brown/', '/fox/'];
+        $replacements = ['bear', 'black', 'slow'];
+        echo preg_replace($patterns, $replacements, $string); // The bear black slow jumped over the lazy dog.
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 替换一些值
+        $patterns = ['/(19|20)(\d{2})-(\d{1,2})-(\d{1,2})/', '/^\s*{(\w+)}\s*=/'];
+        $replace = ['\3/\4/\1\2', '$\1 ='];
+        echo preg_replace($patterns, $replace, '{startDate} = 1999-5-27'); // $startDate = 5/27/1999
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 剥离多余的空白字符
+        $str = 'foo    o';
+        echo preg_replace('/\s\s+/', ' ', $str);
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 使用参数count
+        $count = 0;
+        echo preg_replace(['/\d/', '/\s/'], '*', 'xp 4 to', -1, $count); // xp***to
+        echo $count; // 3
+    ?>
+    ```
+
+7. <p id="preg_split">preg_split - 通过一个正则表达式分隔字符串</p>
+
+    **说明**
+
+    _array_ `preg_split`(_string_ $pattern, _string_ $subject [, _int_ $limit = -1 [, _int_ $flags = 0]])
+
+    通过一个正则表达式分隔给定字符串。
+
+    **参数**
+
+    _pattern_： 用于搜索的模式，字符串形式。
+
+    _subject_： 输入字符串。
+
+    _limit_： 如果指定，将限制分隔得到的子串最多只有limit个，返回的最后一个子串将包含所有剩余部分。
+
+    limit值为-1，0或null时都代表"不限制"，作为PHP的标准，你可以使用null跳过对flags的设置。
+
+    _flags_： 可以是`PREG_SPLIT_NO_EMPTY`、`PREG_SPLIT_DELIM_CAPTURE`、`PREG_SPLIT_OFFSET_CAPTURE`中的组合(位或运算)
+
+    * `PREG_SPLIT_NO_EMPTY`：如果这个标记被设置，`preg_split()`将返回分隔后的非空部分。
+
+    * `PREG_SPLIT_DELIM_CAPTURE`：如果这个标记被设置，用于分隔的模式中的括号表达式将被捕获并返回。
+
+    * `PREG_SPLIT_OFFSET_CAPTURE`：如果这个标记被设置，对于每一个出现的匹配返回时将会附加字符串偏移量。注意：这将会改变返回数组中的每一个元素，使其每个元素成为一个由第0个元素为分隔后的子串，第1个元素为该子串在subject中的偏移量组成的数组。
+
+    **返回值**
+
+    返回一个使用pattern边界分隔subject后得到的子串组成的数组。
+
+    **示例**
+
+    ```php
+    <?php
+        // 获取搜索字符串的部分
+        $keywords = preg_split('/[\s,]+/', 'hypertext language, programming');
+        p($keywords); // ['hypertext', 'language', 'programming']
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 将一个字符串分隔为组成它的字符
+        $str = 'string';
+        $chars = preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
+        p($chars); // ['s', 't', 'r', 'i', 'n', 'g']
+    ?>
+    ```
+
+    ```php
+    <?php
+        // 分隔一个字符串并获取每部分的偏移量
+        $str = 'hypertext language programming';
+        $chars = preg_split('/ /', $str, -1, PREG_SPLIT_OFFSET_CAPTURE);
+        p($chars); // [['hypertext', 0], ['language', 10], ['programming', 19]]
     ?>
     ```
 

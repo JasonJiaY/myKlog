@@ -85,6 +85,12 @@
 
 <ol>
 <li><a href="#preg_quote">preg_quote</a> - 转义正则表达式字符</li>
+<li><a href="#preg_filter">preg_filter</a> - 执行一个正则表达式搜索和替换</li>
+<li><a href="#preg_grep">preg_grep</a> - 返回匹配模式的数组条目</li>
+<li><a href="#preg_match">preg_match</a> - 执行一个正则表达式匹配</li>
+<li><a href="#preg_match_all">preg<em>match</em>all</a> - 执行一个全局正则表达式匹配</li>
+<li><a href="#preg_replace">preg_replace</a> - 执行一个正则表达式的搜索和替换</li>
+<li><a href="#preg_split">preg_split</a> - 通过一个正则表达式分隔字符串</li>
 </ol>
 
 <h2>一些准备</h2>
@@ -820,25 +826,25 @@
 <ol>
 <li><p id="preg_quote">preg_quote - 转义正则表达式字符</p>
 
-<p><strong>说明：</strong></p>
+<p><strong>说明</strong></p>
 
-<p><em>string</em> <strong>preg_quote</strong>(<em>string</em> $str [, <em>string</em> $delimiter = NULL])</p>
+<p><em>string</em> <code>preg_quote</code>(<em>string</em> $str [, <em>string</em> $delimiter = NULL])</p>
 
-<p>preg_quote()需要参数str并向其中每个正则表达式语法中的字符前增加一个反斜线。这通常用于一些运行时的字符串，需要将其作为正则表达式来使用的时候。</p>
+<p><code>preg_quote()</code>需要参数str并向其中每个正则表达式语法中的字符前增加一个反斜线。这通常用于一些运行时的字符串，需要将其作为正则表达式来使用的时候。</p>
 
 <p>正则表达式特殊字符有：<code>. \ + * ? [ ^ ] $ ( ) { } = ! &lt; &gt; | : -</code></p>
 
-<p><strong>参数：</strong></p>
+<p><strong>参数</strong></p>
 
 <p><em>str</em>： 输入字符串</p>
 
 <p><em>delimiter</em>： 如果指定了可选参数delimiter，它也会被转义。这通常用于转义PCRE函数使用的分隔符。&#39;/&#39;是最通用的分隔符。</p>
 
-<p><strong>返回值：</strong></p>
+<p><strong>返回值</strong></p>
 
 <p>返回转义后的字符串</p>
 
-<p><strong>示例：</strong></p>
+<p><strong>示例</strong></p>
 <div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
     <span class="nv">$keywords</span> <span class="o">=</span> <span class="s1">&#39;$40 for a g3/400&#39;</span><span class="p">;</span>
     <span class="nv">$pattern</span> <span class="o">=</span> <span class="nb">preg_quote</span><span class="p">(</span><span class="nv">$keywords</span><span class="p">);</span>
@@ -855,8 +861,279 @@
     <span class="nx">p</span><span class="p">(</span><span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$pattern</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">));</span> <span class="c1">// 5 is a number</span>
 <span class="cp">?&gt;</span><span class="x"></span>
 </code></pre></div></li>
-</ol>
+<li><p id="preg_filter">preg_filter - 执行一个正则表达式搜索和替换</p>
 
+<p><strong>说明</strong></p>
+
+<p><em>mixed</em> <code>preg_filter</code>(<em>mixed</em> $pattern, <em>mixed</em> $replacement, <em>mixed</em> $subject [, int $limit = -1 [, int &amp;$count]])</p>
+
+<p><code>preg_filter()</code>等价于<code>preg_replace()</code>除了它仅仅返回(可能经过转化)与目标匹配的结果。</p>
+
+<p><strong>返回值</strong></p>
+
+<p>如果subject是一个数组，返回一个数组，其他情况返回一个字符串。</p>
+
+<p>如果没有找到匹配或者发生了错误，当subject是数组时返回一个空数组，其他情况返回NULL。</p>
+
+<p><strong>示例</strong></p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 比较preg_filter()与preg_replace()</span>
+    <span class="nv">$subject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">];</span>
+    <span class="nv">$pattern</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/\d/&#39;</span><span class="p">,</span> <span class="s1">&#39;/[a-z]/&#39;</span><span class="p">,</span> <span class="s1">&#39;/[1a]/&#39;</span><span class="p">];</span>
+    <span class="nv">$replace</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A:$0&#39;</span><span class="p">,</span> <span class="s1">&#39;B:$0&#39;</span><span class="p">,</span> <span class="s1">&#39;C:$0&#39;</span><span class="p">];</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nb">preg_filter</span><span class="p">(</span><span class="nv">$pattern</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">));</span>
+    <span class="c1">// [0 =&gt; &#39;A:C:1&#39;, 1 =&gt; &#39;B:C:a&#39;, 2 =&gt; &#39;A:2&#39;, 3 =&gt; &#39;B:b&#39;, 4 =&gt; &#39;A:3&#39;, 7 =&gt; &#39;A:4&#39;]</span>
+
+    <span class="nx">p</span><span class="p">(</span><span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$pattern</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">));</span>
+    <span class="c1">// [0 =&gt; &#39;A:C:1&#39;, 1 =&gt; &#39;B:C:a&#39;, 2 =&gt; &#39;A:2&#39;, 3 =&gt; &#39;B:b&#39;, 4 =&gt; &#39;A:3&#39;, 5 =&gt; &#39;A&#39;, 6 =&gt; &#39;B&#39;, 7 =&gt; &#39;A:4&#39;]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p id="preg_grep">preg_grep - 返回匹配模式的数组条目</p>
+
+<p><strong>说明</strong></p>
+
+<p><em>array</em> <code>preg_grep</code>(<em>string</em> $pattern, <em>array</em> $input [, int $flags = 0])</p>
+
+<p>返回给定数组input中与模式pattern匹配的元素组成的数组。</p>
+
+<p><strong>参数</strong></p>
+
+<p><em>pattern</em>： 要搜索的模式，字符串形式。</p>
+
+<p><em>input</em>： 输入数组。</p>
+
+<p><em>flags</em>： 如果设置为<code>PREG_GREP_INVERT</code>，这个函数返回输入数组中与给定模式pattern不匹配的元素组成的数组。</p>
+
+<p><strong>返回值</strong></p>
+
+<p>返回使用input中key做索引的数组。</p>
+
+<p><strong>示例</strong></p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="nv">$array</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0.12&#39;</span><span class="p">,</span> <span class="s1">&#39;.3&#39;</span><span class="p">,</span> <span class="s1">&#39;88&#39;</span><span class="p">,</span> <span class="s1">&#39;4a&#39;</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">];</span>
+    <span class="nv">$fl_array</span> <span class="o">=</span> <span class="nb">preg_grep</span><span class="p">(</span><span class="s1">&#39;/^(\d+)?\.\d+$/&#39;</span><span class="p">,</span> <span class="nv">$array</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$fl_array</span><span class="p">);</span> <span class="c1">// [0 =&gt; &#39;0.12&#39;, 1 =&gt; &#39;.3&#39;, 4 =&gt; 7.8]</span>
+
+    <span class="nv">$other_array</span> <span class="o">=</span> <span class="nb">preg_grep</span><span class="p">(</span><span class="s1">&#39;/^(\d+)?\.\d+$/&#39;</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nx">PREG_GREP_INVERT</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$other_array</span><span class="p">);</span> <span class="c1">// [2 =&gt; &#39;88&#39;, 3 =&gt; &#39;4a&#39;]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p id="preg_match">preg_match - 执行一个正则表达式匹配</p>
+
+<p><strong>说明</strong></p>
+
+<p><em>int</em> <code>preg_match</code>(<em>string</em> $pattern, <em>string</em> $subject [, <em>array</em> &amp;$matches [, <em>int</em> $flag = 0 [, <em>int</em> $offset = 0]]])</p>
+
+<p>搜索subject与pattern给定的正则表达式的一个匹配。</p>
+
+<p><strong>参数</strong></p>
+
+<p><em>pattern</em>： 要搜索的模式，字符串类型。</p>
+
+<p><em>subject</em>： 输入字符串。</p>
+
+<p><em>matches</em>： 如果提供了参数matches，它将被填充为搜索结果。<code>$matches[0]</code>将包含完整模式匹配到的文本，<code>$matches[1]</code>将包含第一个捕获子组匹配到的文本，以此类推。</p>
+
+<p><em>flags</em>： flags如果被设置为<code>PREF_OFFSET_CAPTURE</code>，对于每一个出现的匹配返回时都会附加字符串偏移量(相对于目标字符串)。注意：这会改变填充到matches参数的数组，使其每个元素成为一个由第0个元素是匹配到的字符串，第1个元素是该匹配字符串在目标字符串subject中的偏移量。</p>
+
+<p><em>offset</em>： 通常从目标字符串的开始位置开始。可选参数offset用于指定从目标字符串的某个未知开始搜索(单位是字节)。</p>
+
+<p><strong>返回值</strong></p>
+
+<p><code>preg_match()</code>返回pattern的匹配次数。它的值将是0次(不匹配)或1次，因为<code>preg_match()</code>在第一次匹配后将会停止搜索。</p>
+
+<p><strong>示例</strong></p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/php/i&#39;</span><span class="p">,</span> <span class="s1">&#39;PHP is the web scripting language of choice.&#39;</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">&#39;A match was found&#39;</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">&#39;A match was not found&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 从URL中获取主机名称</span>
+    <span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;@^(?:http://)?([^/]+)@i&#39;</span><span class="p">,</span> <span class="s1">&#39;http://www.php.net/index.html&#39;</span><span class="p">,</span> <span class="nv">$matches</span><span class="p">);</span>
+    <span class="nv">$host</span> <span class="o">=</span> <span class="nv">$matches</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="c1">// www.php.net</span>
+
+    <span class="c1">// 获取主机名称的后面两部分</span>
+    <span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/[^.]+\.[^.]+$/&#39;</span><span class="p">,</span> <span class="nv">$host</span><span class="p">,</span> <span class="nv">$matches</span><span class="p">);</span> <span class="c1">// [^.] 相当于 [^/.]</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$mathces</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="c1">// php.net</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 使用命名子组</span>
+    <span class="nv">$str</span> <span class="o">=</span> <span class="s1">&#39;foobar: 2008&#39;</span><span class="p">;</span>
+    <span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/(?&lt;name&gt;\w+): (?&lt;digit&gt;\d+)/&#39;</span><span class="p">,</span> <span class="nv">$str</span><span class="p">,</span> <span class="nv">$matches</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$matches</span><span class="p">);</span> <span class="c1">// [0 =&gt; &#39;foobar: 2008&#39;, &#39;name&#39; =&gt; &#39;foobar&#39;, 1 =&gt; &#39;foobar&#39;, digit =&gt; &#39;2008&#39;, 2 =&gt; &#39;2008&#39;]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p id="preg_match_all">preg_match_all - 执行一个全局正则表达式匹配</p>
+
+<p><strong>说明</strong></p>
+
+<p><em>int</em> <code>preg_match_all</code>(<em>string</em> $pattern, <em>string</em> $subject [, <em>array</em> &amp;$matches [, <em>int</em> $flags = <code>PREG_PATTERN_ORDER</code> [, <em>int</em> $offset = 0]]])</p>
+
+<p>搜索subject中所有匹配pattern给定正则表达式的匹配结果并且将它们以flag指定顺序输出到matches中。</p>
+
+<p>在第一个匹配找到后，子序列继续从最后一次匹配位置搜索。</p>
+
+<p><strong>参数</strong></p>
+
+<p><em>pattern</em>： 要搜索的模式，字符串形式。</p>
+
+<p><em>subject</em>： 输入字符串。</p>
+
+<p><em>matches</em>： 多维数组，作为输出参数输出所有匹配结果，数组排序通过flags指定。</p>
+
+<p><em>flags</em>： 可以结合下面标记使用(注意不能同时使用<code>PREG_PATTERN_ORDER</code>和<code>PREG_SET_ORDER</code>)：</p>
+
+<ul>
+<li><p><code>PREG_PATTERN_ORDER</code>：结果排序为<code>$matches[0]</code> 保存完整模式的所有匹配，<code>$matches[1]</code> 保存第一个子组的所有匹配，依次类推。</p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="nb">preg_match_all</span><span class="p">(</span><span class="s1">&#39;|&lt;[^&gt;]+&gt;(.*)&lt;/[^&gt;]+&gt;|U&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;b&gt;example:&lt;/b&gt;&lt;div align=left&gt;this is a test&lt;/div&gt;&#39;</span><span class="p">,</span> <span class="nv">$out</span><span class="p">,</span> <span class="nx">PREG_PATTERN_ORDER</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$out</span><span class="p">);</span> <span class="c1">// [[&#39;&lt;b&gt;example:&lt;/b&gt;&#39;, &#39;&lt;div align=left&gt;this is a test&lt;/div&gt;&#39;], [&#39;example:&#39;, &#39;this is a test&#39;]]</span>
+    <span class="c1">// ========================================================</span>
+    <span class="c1">// $out[0] 是包含匹配完整模式的字符串的数组，$out[1] 是包含闭合标签内的字符串的数组。</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p><code>PREG_SET_ORDER</code>：结果排序为<code>$matches[0]</code>包含第一次匹配得到的所有匹配(包含子组)，<code>$matches[1]</code>是包含第二次匹配到的所有匹配(包含子组)的数组，以此类推。</p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="nb">preg_match_all</span><span class="p">(</span><span class="s1">&#39;|&lt;[^&gt;]+&gt;(.*)&lt;/[^&gt;]+&gt;|U&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;b&gt;example: &lt;/b&gt;&lt;div align=\&quot;left\&quot;&gt;this is a test&lt;/div&gt;&#39;</span><span class="p">,</span> <span class="nv">$out</span><span class="p">,</span> <span class="nx">PREG_SET_ORDER</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$out</span><span class="p">);</span> <span class="c1">// [[&#39;&lt;b&gt;example:&lt;/b&gt;&#39;, &#39;example&#39;], [&#39;&lt;div align=\&quot;left\&quot;&gt;this is a test&lt;/div&gt;&#39;, &#39;this is a test&#39;]]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p><code>PREG_OFFSET_CAPTURE</code>：如果这个标记被传递，每个发现的匹配返回时会增加它相对目标字符串的偏移量。注意这会改变matches中的每一个匹配结果字符串元素，使其成为一个第0个元素为匹配结果字符串，第1个元素为匹配结果字符串在subject中的偏移量。</p></li>
+</ul>
+
+<p><em>offset</em>  通常，查找时从目标字符串的开始位置开始。可选参数offset用于从目标字符串中制定位置开始搜索(单位是字节)。</p>
+
+<p><strong>返回值</strong></p>
+
+<p>返回完整匹配次数(可能是0)，或者如果发生错误返回FALSE。</p>
+
+<p><strong>示例</strong></p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 查找所有文本中的电话号码</span>
+    <span class="nb">preg_match_all</span><span class="p">(</span><span class="s1">&#39;/\(? (\d{3})? \)? (?(1) [\-\s]) \d{3}-\d{4}/x&#39;</span><span class="p">,</span> <span class="s1">&#39;Call 555-1212 or 1-800-555-1212&#39;</span><span class="p">,</span> <span class="nv">$phones</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$phones</span><span class="p">);</span> <span class="c1">// [[&#39;555-1212&#39;, &#39;800-555-1212&#39;], [&#39;&#39;, &#39;800&#39;]]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p id="preg_replace">preg_replace</p>
+
+<p><strong>说明</strong></p>
+
+<p><em>mixed</em> <code>preg_replace</code>(<em>mixed</em> $pattern, <em>mixed</em> $replacement, <em>mixed</em> $subject [, <em>int</em> $limit = -1 [, <em>int</em> &amp;$count]])</p>
+
+<p>搜索subject中匹配pattern的部分，以replacement进行替换。</p>
+
+<p><strong>参数</strong></p>
+
+<p><em>pattern</em>： 要搜索的模式。可以是一个字符串或字符串数组。</p>
+
+<p><em>replacement</em>： 用于替换的字符串或字符串数组。如果这个参数是一个字符串，并且pattern是一个数组，那么所有的模式都使用这个字符串进行替换。如果pattern和replacement都是数组，每个pattern使用replacement中对应的元素进行替换。如果replacement中的元素比pattern中的少，多出来的pattern使用空字符串进行替换。</p>
+
+<p><em>subject</em>： 要进行搜索和替换的字符串或字符串数组。如果subject是一个数组，搜索和替换会在subject的每一个元素上进行，并且返回值也会是一个数组。</p>
+
+<p><em>limit</em>： 每个模式在每个subject上进行替换的最大次数，默认是-1(无限)。</p>
+
+<p><em>count</em>： 如果指定，将会被填充为完成的替换次数。</p>
+
+<p><strong>返回值</strong></p>
+
+<p>如果subject是一个数组，<code>preg_replace()</code>返回一个数组，其它情况下返回一个字符串。</p>
+
+<p>如果匹配被查找到，替换后的subject被返回，其它情况下返回没有改变的subject。如果发生错误，返回NULL。</p>
+
+<p><strong>示例</strong></p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 使用后向引用紧跟数值原文</span>
+    <span class="nv">$string</span> <span class="o">=</span> <span class="s1">&#39;April 15, 2013&#39;</span><span class="p">;</span>
+    <span class="nv">$pattern</span> <span class="o">=</span> <span class="s1">&#39;/(\w+) (\d+), (\d+)/i&#39;</span><span class="p">;</span>
+    <span class="nv">$replacement</span> <span class="o">=</span> <span class="s1">&#39;${1}1,$3&#39;</span><span class="p">;</span> <span class="c1">// 使用{}分开两个1</span>
+    <span class="k">echo</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$pattern</span><span class="p">,</span> <span class="nv">$replacement</span><span class="p">,</span> <span class="nv">$string</span><span class="p">);</span> <span class="c1">// April1,2013</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// preg_replace()中使用基于索引的数组</span>
+    <span class="nv">$string</span> <span class="o">=</span> <span class="s1">&#39;The quick brown fox jumped over the lazy dog.&#39;</span><span class="p">;</span>
+    <span class="nv">$patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/quick/&#39;</span><span class="p">,</span> <span class="s1">&#39;/brown/&#39;</span><span class="p">,</span> <span class="s1">&#39;/fox/&#39;</span><span class="p">];</span>
+    <span class="nv">$replacements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bear&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;slow&#39;</span><span class="p">];</span>
+    <span class="k">echo</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$patterns</span><span class="p">,</span> <span class="nv">$replacements</span><span class="p">,</span> <span class="nv">$string</span><span class="p">);</span> <span class="c1">// The bear black slow jumped over the lazy dog.</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 替换一些值</span>
+    <span class="nv">$patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/(19|20)(\d{2})-(\d{1,2})-(\d{1,2})/&#39;</span><span class="p">,</span> <span class="s1">&#39;/^\s*{(\w+)}\s*=/&#39;</span><span class="p">];</span>
+    <span class="nv">$replace</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;\3/\4/\1\2&#39;</span><span class="p">,</span> <span class="s1">&#39;$\1 =&#39;</span><span class="p">];</span>
+    <span class="k">echo</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$patterns</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="s1">&#39;{startDate} = 1999-5-27&#39;</span><span class="p">);</span> <span class="c1">// $startDate = 5/27/1999</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 剥离多余的空白字符</span>
+    <span class="nv">$str</span> <span class="o">=</span> <span class="s1">&#39;foo    o&#39;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="s1">&#39;/\s\s+/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="nv">$str</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 使用参数count</span>
+    <span class="nv">$count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nb">preg_replace</span><span class="p">([</span><span class="s1">&#39;/\d/&#39;</span><span class="p">,</span> <span class="s1">&#39;/\s/&#39;</span><span class="p">],</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;xp 4 to&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span> <span class="c1">// xp***to</span>
+    <span class="k">echo</span> <span class="nv">$count</span><span class="p">;</span> <span class="c1">// 3</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+<li><p id="preg_split">preg_split - 通过一个正则表达式分隔字符串</p>
+
+<p><strong>说明</strong></p>
+
+<p><em>array</em> <code>preg_split</code>(<em>string</em> $pattern, <em>string</em> $subject [, <em>int</em> $limit = -1 [, <em>int</em> $flags = 0]])</p>
+
+<p>通过一个正则表达式分隔给定字符串。</p>
+
+<p><strong>参数</strong></p>
+
+<p><em>pattern</em>： 用于搜索的模式，字符串形式。</p>
+
+<p><em>subject</em>： 输入字符串。</p>
+
+<p><em>limit</em>： 如果指定，将限制分隔得到的子串最多只有limit个，返回的最后一个子串将包含所有剩余部分。</p>
+
+<p>limit值为-1，0或null时都代表&quot;不限制&quot;，作为PHP的标准，你可以使用null跳过对flags的设置。</p>
+
+<p><em>flags</em>： 可以是<code>PREG_SPLIT_NO_EMPTY</code>、<code>PREG_SPLIT_DELIM_CAPTURE</code>、<code>PREG_SPLIT_OFFSET_CAPTURE</code>中的组合(位或运算)</p></li>
+</ol>
+<div class="highlight"><pre><code class="language-text" data-lang="text">* `PREG_SPLIT_NO_EMPTY`：如果这个标记被设置，`preg_split()`将返回分隔后的非空部分。
+
+* `PREG_SPLIT_DELIM_CAPTURE`：如果这个标记被设置，用于分隔的模式中的括号表达式将被捕获并返回。
+
+* `PREG_SPLIT_OFFSET_CAPTURE`：如果这个标记被设置，对于每一个出现的匹配返回时将会附加字符串偏移量。注意：这将会改变返回数组中的每一个元素，使其每个元素成为一个由第0个元素为分隔后的子串，第1个元素为该子串在subject中的偏移量组成的数组。
+
+**返回值**
+
+返回一个使用pattern边界分隔subject后得到的子串组成的数组。
+
+**示例**
+
+```php
+&lt;?php
+    // 获取搜索字符串的部分
+    $keywords = preg_split(&#39;/[\s,]+/&#39;, &#39;hypertext language, programming&#39;);
+    p($keywords); // [&#39;hypertext&#39;, &#39;language&#39;, &#39;programming&#39;]
+?&gt;
+```
+
+```php
+&lt;?php
+    // 将一个字符串分隔为组成它的字符
+    $str = &#39;string&#39;;
+    $chars = preg_split(&#39;//&#39;, $str, -1, PREG_SPLIT_NO_EMPTY);
+    p($chars); // [&#39;s&#39;, &#39;t&#39;, &#39;r&#39;, &#39;i&#39;, &#39;n&#39;, &#39;g&#39;]
+?&gt;
+```
+
+```php
+&lt;?php
+    // 分隔一个字符串并获取每部分的偏移量
+    $str = &#39;hypertext language programming&#39;;
+    $chars = preg_split(&#39;/ /&#39;, $str, -1, PREG_SPLIT_OFFSET_CAPTURE);
+    p($chars); // [[&#39;hypertext&#39;, 0], [&#39;language&#39;, 10], [&#39;programming&#39;, 19]]
+?&gt;
+```
+</code></pre></div>
 <h2>参考文章</h2>
 
 <ol>
@@ -915,7 +1192,7 @@
     <p class="text-muted credit">
       &copy; 2015 Jason's Klog &middot;
       <a href="https://github.com/arnp/herring-cove"> Herring Cove for Jekyll </a>
-      2015-04-09 11:19:49 +0800
+      2015-04-10 00:00:34 +0800
     </p>
   </footer>
 </div>
