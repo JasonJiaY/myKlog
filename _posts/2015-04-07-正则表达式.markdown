@@ -825,6 +825,7 @@ PCRE 函数
     limit值为-1，0或null时都代表"不限制"，作为PHP的标准，你可以使用null跳过对flags的设置。
 
     _flags_： 可以是`PREG_SPLIT_NO_EMPTY`、`PREG_SPLIT_DELIM_CAPTURE`、`PREG_SPLIT_OFFSET_CAPTURE`中的组合(位或运算)
+    
         * `PREG_SPLIT_NO_EMPTY`：如果这个标记被设置，`preg_split()`将返回分隔后的非空部分。
 
         * `PREG_SPLIT_DELIM_CAPTURE`：如果这个标记被设置，用于分隔的模式中的括号表达式将被捕获并返回。
