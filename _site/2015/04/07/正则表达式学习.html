@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
   <head>
     <meta charset="utf-8">
-<title>正则表达式</title>
+<title>正则表达式学习</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="上善若水，人淡如菊">
 <link href="/css/bootstrap.min.css" rel="stylesheet">
 <link href="/css/hc.css" rel="stylesheet">
 <link href="/css/highlight.css" rel="stylesheet">
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link href="/css/font-awesome.css" rel="stylesheet">
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -61,7 +61,7 @@
 
       <div class="container">
         <div id="article">
-  <div class="article-title">正则表达式</div>
+  <div class="article-title">正则表达式学习</div>
   <p class="meta">
     <small>
       &nbsp;<i class="fa fa-calendar-o"></i> 07 Apr 2015
@@ -88,7 +88,7 @@
 <li><a href="#preg_filter">preg_filter</a> - 执行一个正则表达式搜索和替换</li>
 <li><a href="#preg_grep">preg_grep</a> - 返回匹配模式的数组条目</li>
 <li><a href="#preg_match">preg_match</a> - 执行一个正则表达式匹配</li>
-<li><a href="#preg_match_all">preg<em>match</em>all</a> - 执行一个全局正则表达式匹配</li>
+<li><a href="#preg_match_all"><code>preg_match_all</code></a> - 执行一个全局正则表达式匹配</li>
 <li><a href="#preg_replace">preg_replace</a> - 执行一个正则表达式的搜索和替换</li>
 <li><a href="#preg_split">preg_split</a> - 通过一个正则表达式分隔字符串</li>
 </ol>
@@ -1094,46 +1094,38 @@
 
 <p>limit值为-1，0或null时都代表&quot;不限制&quot;，作为PHP的标准，你可以使用null跳过对flags的设置。</p>
 
-<p><em>flags</em>： 可以是<code>PREG_SPLIT_NO_EMPTY</code>、<code>PREG_SPLIT_DELIM_CAPTURE</code>、<code>PREG_SPLIT_OFFSET_CAPTURE</code>中的组合(位或运算)</p></li>
-</ol>
+<p><em>flags</em>： 可以是<code>PREG_SPLIT_NO_EMPTY</code>、<code>PREG_SPLIT_DELIM_CAPTURE</code>、<code>PREG_SPLIT_OFFSET_CAPTURE</code>中的组合(位或运算)</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">* `PREG_SPLIT_NO_EMPTY`：如果这个标记被设置，`preg_split()`将返回分隔后的非空部分。
 
 * `PREG_SPLIT_DELIM_CAPTURE`：如果这个标记被设置，用于分隔的模式中的括号表达式将被捕获并返回。
 
 * `PREG_SPLIT_OFFSET_CAPTURE`：如果这个标记被设置，对于每一个出现的匹配返回时将会附加字符串偏移量。注意：这将会改变返回数组中的每一个元素，使其每个元素成为一个由第0个元素为分隔后的子串，第1个元素为该子串在subject中的偏移量组成的数组。
-
-**返回值**
-
-返回一个使用pattern边界分隔subject后得到的子串组成的数组。
-
-**示例**
-
-```php
-&lt;?php
-    // 获取搜索字符串的部分
-    $keywords = preg_split(&#39;/[\s,]+/&#39;, &#39;hypertext language, programming&#39;);
-    p($keywords); // [&#39;hypertext&#39;, &#39;language&#39;, &#39;programming&#39;]
-?&gt;
-```
-
-```php
-&lt;?php
-    // 将一个字符串分隔为组成它的字符
-    $str = &#39;string&#39;;
-    $chars = preg_split(&#39;//&#39;, $str, -1, PREG_SPLIT_NO_EMPTY);
-    p($chars); // [&#39;s&#39;, &#39;t&#39;, &#39;r&#39;, &#39;i&#39;, &#39;n&#39;, &#39;g&#39;]
-?&gt;
-```
-
-```php
-&lt;?php
-    // 分隔一个字符串并获取每部分的偏移量
-    $str = &#39;hypertext language programming&#39;;
-    $chars = preg_split(&#39;/ /&#39;, $str, -1, PREG_SPLIT_OFFSET_CAPTURE);
-    p($chars); // [[&#39;hypertext&#39;, 0], [&#39;language&#39;, 10], [&#39;programming&#39;, 19]]
-?&gt;
-```
 </code></pre></div>
+<p><strong>返回值</strong></p>
+
+<p>返回一个使用pattern边界分隔subject后得到的子串组成的数组。</p>
+
+<p><strong>示例</strong></p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 获取搜索字符串的部分</span>
+    <span class="nv">$keywords</span> <span class="o">=</span> <span class="nb">preg_split</span><span class="p">(</span><span class="s1">&#39;/[\s,]+/&#39;</span><span class="p">,</span> <span class="s1">&#39;hypertext language, programming&#39;</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$keywords</span><span class="p">);</span> <span class="c1">// [&#39;hypertext&#39;, &#39;language&#39;, &#39;programming&#39;]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 将一个字符串分隔为组成它的字符</span>
+    <span class="nv">$str</span> <span class="o">=</span> <span class="s1">&#39;string&#39;</span><span class="p">;</span>
+    <span class="nv">$chars</span> <span class="o">=</span> <span class="nb">preg_split</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">,</span> <span class="nv">$str</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">PREG_SPLIT_NO_EMPTY</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$chars</span><span class="p">);</span> <span class="c1">// [&#39;s&#39;, &#39;t&#39;, &#39;r&#39;, &#39;i&#39;, &#39;n&#39;, &#39;g&#39;]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div><div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+    <span class="c1">// 分隔一个字符串并获取每部分的偏移量</span>
+    <span class="nv">$str</span> <span class="o">=</span> <span class="s1">&#39;hypertext language programming&#39;</span><span class="p">;</span>
+    <span class="nv">$chars</span> <span class="o">=</span> <span class="nb">preg_split</span><span class="p">(</span><span class="s1">&#39;/ /&#39;</span><span class="p">,</span> <span class="nv">$str</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">PREG_SPLIT_OFFSET_CAPTURE</span><span class="p">);</span>
+    <span class="nx">p</span><span class="p">(</span><span class="nv">$chars</span><span class="p">);</span> <span class="c1">// [[&#39;hypertext&#39;, 0], [&#39;language&#39;, 10], [&#39;programming&#39;, 19]]</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+</code></pre></div></li>
+</ol>
+
 <h2>参考文章</h2>
 
 <ol>
@@ -1166,7 +1158,7 @@
 
   <script type="text/javascript">
   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-      var disqus_shortname = 'diqus-username'; // required: replace example with your forum shortname
+      var disqus_shortname = 'jiayintaocom'; // required: replace example with your forum shortname
 
       /* * * DON'T EDIT BELOW THIS LINE * * */
       (function() {
@@ -1191,8 +1183,8 @@
   <footer>
     <p class="text-muted credit">
       &copy; 2015 Jason's Klog &middot;
-      <a href="https://github.com/arnp/herring-cove"> Herring Cove for Jekyll </a>
-      2015-04-10 00:00:34 +0800
+      <a href="https://github.com/JasonJiaY"> github.com/JasonJiaY </a>
+      2015-04-12 15:49:17 +0800
     </p>
   </footer>
 </div>

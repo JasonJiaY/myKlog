@@ -13,7 +13,7 @@
 2. [preg_filter](#preg_filter) - 执行一个正则表达式搜索和替换
 3. [preg_grep](#preg_grep) - 返回匹配模式的数组条目
 4. [preg_match](#preg_match) - 执行一个正则表达式匹配
-5. [preg_match_all](#preg_match_all) - 执行一个全局正则表达式匹配
+5. [`preg_match_all`](#preg_match_all) - 执行一个全局正则表达式匹配
 6. [preg_replace](#preg_replace) - 执行一个正则表达式的搜索和替换
 7. [preg_split](#preg_split) - 通过一个正则表达式分隔字符串
 
@@ -825,7 +825,7 @@ PCRE 函数
     limit值为-1，0或null时都代表"不限制"，作为PHP的标准，你可以使用null跳过对flags的设置。
 
     _flags_： 可以是`PREG_SPLIT_NO_EMPTY`、`PREG_SPLIT_DELIM_CAPTURE`、`PREG_SPLIT_OFFSET_CAPTURE`中的组合(位或运算)
-    
+
         * `PREG_SPLIT_NO_EMPTY`：如果这个标记被设置，`preg_split()`将返回分隔后的非空部分。
 
         * `PREG_SPLIT_DELIM_CAPTURE`：如果这个标记被设置，用于分隔的模式中的括号表达式将被捕获并返回。
