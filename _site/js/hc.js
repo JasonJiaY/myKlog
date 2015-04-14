@@ -9,7 +9,7 @@ $(document).ready(function() {
     var fixedTitle = function() {
         $('#fixedTitle').css({
             'height' : '36px',
-            'backgroundColor' : 'rgba(255, 255, 255, 0.85)',
+            'backgroundColor' : 'rgba(245, 245, 245, 0.85)',
             'position' : 'fixed',
             "overflow" : "hidden",
             "boxShadow" : "0 10px 14px 0 #e8e8e8",
@@ -19,9 +19,18 @@ $(document).ready(function() {
             "borderTop" : "solid 3px #d90006",
         });
 
+        $("#fixedTitle a").css({
+            "float" : "right",
+            "width" : "40px",
+            "height" : "36px",
+            "lineHeight" : "33px",
+        }).click(function(){
+            $(document).scrollTop(0);
+        });
+
         var titles = [];
 
-        $('h2').each(function(){
+        $('.post h2').each(function(){
             titles.push({'top' : $(this).offset().top, 'html' : $(this).html()});
         })
         var titlesLength = titles.length;
@@ -34,18 +43,29 @@ $(document).ready(function() {
             for (var i = 0; i < titlesLength; i++) {
                 if (i == titlesLength - 1 && titles[i].top < currentScrollTop) {
                     $("#fixedTitle").css('opacity', '1');
-                    $("#fixedTitle").html('<h2 style="border:none; margin-top:0; margin-left:40px;">'+titles[i].html+'</h2>');
+                    $("#fixedTitle h2").css({
+                        "float" : "left",
+                        "border" : "none",
+                        "marginTop" : "-3px",
+                        "marginLeft" : "40px"
+                    }).html(titles[i].html);
+                    $(".post h2").eq(i).css("opacity", 0);
                     break;
                 } else if (titles[i].top > currentScrollTop) {
                     if (i > 0 && titles[i-1].top < currentScrollTop) {
                         $("#fixedTitle").css('opacity', '1');
-                        $("#fixedTitle").html('<h2 style="border:none; margin-top:0; margin-left:40px;">'+titles[i-1].html+'</h2>');
-                        $("h2").css("opacity", "1");
-                        $("h2").eq(i).css("opacity", "0");
+                        $("#fixedTitle h2").css({
+                            "float" : "left",
+                            "border" : "none",
+                            "marginTop" : "-3px",
+                            "marginLeft" : "40px"
+                        }).html(titles[i-1].html);
+                        $(".post h2").css("opacity", 1);
+                        $(".post h2").eq(i-1).css("opacity", 0);
                     } else {
-                        $("h2").css("opacity", "1");
-                        $("#fixedTitle").html('');
-                        $("#fixedTitle").css('opacity', '0');
+                        $(".post h2").css("opacity", 1);
+                        $("#fixedTitle h2").html("");
+                        $("#fixedTitle").css('opacity', 0);
                     }
 
                     break;
