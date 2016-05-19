@@ -1,7 +1,7 @@
 1. [cURL简介](#curlIntroduction)
 2. [cURL执行单任务](#curlExec)
 3. [cURL执行多任务](#curlMultiExec)
-4. [多任务下载-为完善](#multiDownload)
+4. [多任务下载-未完善](#multiDownload)
 
 
 <h2 id="curlIntroduction">1. cURL简介</h2>
@@ -193,7 +193,7 @@ class MultiDownload
         return $length;
     }
 }
-?>
+?
 ```
 
 
