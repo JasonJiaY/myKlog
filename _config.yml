@@ -14,7 +14,7 @@ disqus: jiayintaocom
 ##Make sure to edit the above fields, especially for disqus.
 timezone: Asia/Shanghai
 highlighter: pygments
-markdown: redcarpet
+# markdown: redcarpet
 redcarpet:
  extensions: ["tables"]
 
