@@ -1,0 +1,193 @@
+1. [cURL简介](#curlIntroduction)
+2. [cURL执行单任务](#curlExec)
+3. [cURL执行多任务](#curlMultiExec)
+4. [多任务下载-为完善](#multiDownload)
+
+
+### 1. cURL简介{#curlIntroduction}
+libcurl库可以与各种服务器使用各种类型的协议进行连接和通讯。libcurl目前支持http/https/ftp/gopher/telnet/dict/file/ldap协议。libcurl同时也支持HTTPS认证/HTTP POST/HTTP PUT/FTP上传(这个也能通过PHP的FTP扩展完成)/HTTP基于表单的上传/代理/cookies/用户名+密码的认证。
+
+### 2. curl执行单任务{#curlExec}
+```php
+// 创建一个curl资源
+$ch = curl_init();
+// 设置url
+curl_setopt($ch, CURLOPT_URL, 'http://qq.com');
+// 将收到的内容作为字符串返回
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// 执行并获取内容
+$output = curl_exec($ch);
+// 关闭curl资源 释放系统资源
+curl_close($ch);
+```
+
+### 3. cURL执行多任务{#curlMultiExec}
+```php
+// 创建2个curl资源
+$ch1 = curl_init('http://qq.com');
+$ch2 = curl_init('http://163.com');
+// 设置响应的选项
+curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+// 创建批处理curl句柄
+$mh = curl_multi_init();
+// 添加句柄
+curl_multi_add_handle($mh, $ch1);
+curl_multi_add_handle($mh, $ch2);
+// 执行多任务
+$running = null; // 线程数
+do {
+    usleep(10000);
+    curl_multi_exec($mh, $running);
+} while ($running > 0);
+// 关闭句柄
+curl_multi_remove_handle($mh, $ch1);
+curl_multi_remove_handle($mh, $ch2);
+curl_multi_close($mh);
+```
+
+### 4. 多任务下载-为完善{#multiDownload}
+```php
+// curl多任务下载
+class MultiDownload
+{
+    const TASK_NUM = 2; // 可同时下载任务数量
+
+    private $taskAll; // 所有下载的任务 队列
+    private $taskCurrent; // 进行中的任务 列表
+
+    private $mh; // 多任务句柄
+    private $running; // 线程数-当前
+    private $lastRunning = 0; // 线程数
+
+    // 进行多任务下载
+    // 每个task需包含task_name task_path task_url
+    public function __construct($tasks)
+    {
+        $this->taskAll = $tasks;
+        $this->mh = curl_multi_init();
+        // 初始化任务
+        $this->initTask();
+    }
+
+    // 初始化任务
+    private function initTask()
+    {
+        // 创建并添加curl句柄
+        for ($i = 0; $i < self::TASK_NUM; $i ++) {
+            if (!$this->newTask()) break;
+        }
+        // 执行下载
+        $this->execTask();
+    }
+
+    private function execTask()
+    {
+        do {
+            curl_multi_exec($this->mh, $this->running);
+
+            // 判断是否有线程结束
+            if ($this->running < $this->lastRunning) {
+                $this->lastRunning --;
+                // 检测任务是否执行完毕
+                if ($this->checkCurrentTask()) { // 完成任务
+                    // 开启新任务
+                    $this->newTask();
+                } else { // 任务失败
+                    // 新思路 对所有当前的任务进行断点下载 TODO
+                }
+            }
+
+        } while ($this->running > 0);
+    }
+
+    // 开启新任务
+    private function newTask()
+    {
+        if (empty($this->taskAll)) return false;
+        // 获取新任务
+        $task = array_shift($this->taskAll);
+        $ch = $this->curlSetting($task['task_url']);
+        // 将新任务添加到当前任务列表中
+        $this->taskCurrent[$ch] = $task;
+        curl_multi_add_handle($this->mh, $ch);
+
+        $this->lastRunning ++;
+        return true;
+    }
+
+    // 检测当前是否有任务完成
+    private function checkCurrentTask()
+    {
+        $hasDownloaded = false;
+        // 遍历当前所有任务
+        foreach ($this->taskCurrent as $ch => $task) {
+            if ($task['current_size'] >= $task['size']) {
+                // 删除当前任务
+                unset($this->taskCurrent[$ch]);
+                // curl_multi_remove_handle($this->mh, $ch); // ch由资源型转成了int类型
+                $hasDownloaded = true;
+                break;
+            }
+        }
+        return $hasDownloaded;
+    }
+
+    // curl设置
+    // is_breakpoint 是否进行断点下载
+    // offset 断点下载的偏移量
+    private function curlSetting($url, $is_breakpoint = false; $offset = 0)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // 重定向设置
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // 允许重定向
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 1); // 允许重定向次数1次
+        // 终止线程设置
+        curl_setopt($ch, CURLOPT_LOW_SPEED_LIMIT, 1); // 最低速度限制在1字节每秒
+        curl_setopt($ch, CURLOPT_LOW_SPEED_TIME, 20); // 最多允许持续20秒在最低速度以下
+        // 数据缓冲设置
+        curl_setopt($ch, CURLOPT_BUFFERSIZE, 1024000);
+        // 数据接收处理
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, [$this, 'receiveheader']); // 设置接收到头信息的方法
+        curl_setopt($ch, CURLOPT_WRITEFUNCTION, [$this, 'receivebody']); // 设置写入内容的方法
+
+        // 断点下载偏移设置
+        if ($is_breakpoint) curl_setopt($ch, CURLOPT_RESUME_FROM, $offset);
+
+        return $ch;
+    }
+
+    private function receiveHeader($ch, $string)
+    {
+        // 获取文件大小数值
+        if (preg_match('/^Content-Length: (?<size>\d+)\s+$/U', $string, $matches)) {
+            $size = (int)$matches['size'];
+            $this->taskCurrent[$ch]['size'] = $size; // 总字节数
+            $this->taskCurrent[$ch]['current_size'] = 0; // 已下载字节数
+            // 在命令行输出提示消息
+            echo sprintf("%s开始下载啦！大小%sMb\n",
+                $this->taskCurrent[$ch]['task_name'],
+                number_format($size / 1000000, 2, '.', '')
+            );
+        }
+        return strlen($string);
+    }
+
+    private function receiveBody($ch, $string)
+    {
+        $length = strlen($string);
+        // 以追加的方式打开 文件不存在则创建
+        $fp = fopen($this->taskCurrent[$ch]['task_path'], 'a');
+        fwrite($fp, $string);
+        $this->taskCurrent[$ch]['current_size'] += $length;
+        // 是否下载完毕
+        if ($this->taskCurrent[$ch]['current_size'] >= $this->taskCurrent[$ch]['size']) {
+            fclose($fp);
+        }
+        return $length;
+    }
+}
+```
+
+
