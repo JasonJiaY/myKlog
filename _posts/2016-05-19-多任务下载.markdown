@@ -4,11 +4,12 @@
 4. [多任务下载-为完善](#multiDownload)
 
 
-### 1. cURL简介{#curlIntroduction}
+<h2 id="curlIntroduction">1. cURL简介</h2>
 libcurl库可以与各种服务器使用各种类型的协议进行连接和通讯。libcurl目前支持http/https/ftp/gopher/telnet/dict/file/ldap协议。libcurl同时也支持HTTPS认证/HTTP POST/HTTP PUT/FTP上传(这个也能通过PHP的FTP扩展完成)/HTTP基于表单的上传/代理/cookies/用户名+密码的认证。
 
-### 2. curl执行单任务{#curlExec}
+<h2 id="curlExec">2. curl执行单任务</h2>
 ```php
+<?php
 // 创建一个curl资源
 $ch = curl_init();
 // 设置url
@@ -19,10 +20,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $output = curl_exec($ch);
 // 关闭curl资源 释放系统资源
 curl_close($ch);
+?>
 ```
 
-### 3. cURL执行多任务{#curlMultiExec}
+<h2 id="curlMultiExec">3. cURL执行多任务</h2>
 ```php
+<?php
 // 创建2个curl资源
 $ch1 = curl_init('http://qq.com');
 $ch2 = curl_init('http://163.com');
@@ -44,10 +47,12 @@ do {
 curl_multi_remove_handle($mh, $ch1);
 curl_multi_remove_handle($mh, $ch2);
 curl_multi_close($mh);
+?>
 ```
 
-### 4. 多任务下载-为完善{#multiDownload}
+<h2 id="multiDownload">4. 多任务下载-未完善</h2>
 ```php
+<?php
 // curl多任务下载
 class MultiDownload
 {
@@ -188,6 +193,7 @@ class MultiDownload
         return $length;
     }
 }
+?>
 ```
 
 
