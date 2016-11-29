@@ -41,6 +41,7 @@
 下面是使用php程序对图片进行二值化：
 
 ```php
+<?php
 class ImageRecognize
 {
     public static function binary($im)
