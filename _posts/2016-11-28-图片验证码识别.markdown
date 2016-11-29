@@ -14,3 +14,14 @@
 这个时候，验证码识别就显得特别重要了。他不能阻挡我们为用户和社会节省时间成本，满足用户需求。也为了我们能够发展自己的产品，创造收益。
 
 <h2 id="show">3. 一些常见的验证码</h2>
+![德邦验证码](https://www.deppon.com/user/authCode.action?type=track)
+
+![EMS验证码](http://www.ems.com.cn/ems/rand)
+
+![顺丰验证码](https://i.sf-express.com/service/user/verifycode)
+
+![宅急送验证码](http://www.zjs.com.cn/captcha.svl)
+
+![名航快递验证码](http://www.cae.com.cn/webfunction/expressquery/ExpressQueryCode.aspx)
+
+![快捷速递验证码](http://www.fastexpress.com.cn/randCodeImage)
