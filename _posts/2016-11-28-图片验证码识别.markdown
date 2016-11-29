@@ -28,7 +28,7 @@
 ![快捷速递验证码](http://www.fastexpress.com.cn/randCodeImage)
 -->
 
-![image](/images/verifyCode.png)
+![image](/images/verifycode.png)
 
 <h2 id="how">4. How?怎么识别这些验证码</h2>
 验证码怎么识别呢?我们先从没有干扰背景的验证码说起。
