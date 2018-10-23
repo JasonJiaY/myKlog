@@ -29,7 +29,7 @@
 ![快捷速递验证码](http://www.fastexpress.com.cn/randCodeImage)
 -->
 
-![image]({{ site.baseurl }}/images/verifycode.png)
+![image](images/verifycode.png)
 
 ## 4. How?怎么识别这些验证码 {#how}
 验证码怎么识别呢?我们先从没有干扰背景的验证码说起。
