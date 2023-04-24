@@ -32,7 +32,7 @@ github_username: mumuld
 
 # Build settings
 # theme: jekyll-theme-yat
-remote-theme: jeffreytse/jekyll-theme-yat
+remote_theme: 'jeffreytse/jekyll-theme-yat'
 plugins:
   - jekyll-feed
 # Exclude from processing.
